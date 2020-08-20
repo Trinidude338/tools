@@ -28,10 +28,17 @@ def main():
             c = -1
         if (c == 27):
             curses.mousemask(0)
-            while (stdscr.getch()!=curses.KEY_DC):
+            while (1):
+                try:
+                    c = stdscr.getch()
+                except:
+                    c = 0
+                if (c == curses.KEY_DC):
+                    curses.endwin()
+                    exit(0)
+                elif (c == 27):
+                    break
                 time.sleep(0.016)
-            curses.endwin()
-            exit(0)
         num = ""
         if (c == curses.KEY_F0):
             num = stdscr.getstr()
