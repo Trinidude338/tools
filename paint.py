@@ -15,7 +15,7 @@ def main():
     chars = []
     mouse = (0,0,0,0,0)
     maxyx = stdscr.getmaxyx()
-    curs = [math.trunc(maxyx[0]/2), math.trunc(maxyx[1]/2)]
+    curs = [0, 0]
     while(1):
         drawChars(stdscr, chars)
         try:
@@ -27,7 +27,8 @@ def main():
             mouse = (0,0,0,0,0)
             c = -1
         if (c == 27):
-            while (stdscr.getch()==curses.ERR):
+            curses.mousemask(0)
+            while (stdscr.getch()!=curses.KEY_DC):
                 time.sleep(0.016)
             curses.endwin()
             exit(0)
