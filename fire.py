@@ -11,6 +11,8 @@ def main():
     curses.noecho()
     curses.cbreak()
     curses.start_color()
+    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_RED)
+    curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_BLACK)
     stdscr.keypad(True)
     stdscr.nodelay(True)
     maxyx = stdscr.getmaxyx()
@@ -124,26 +126,36 @@ def drawBuff(stdscr, intensity):
         for x in range(maxyx[1]):
             if(intensity[y][x]<10):
                 shade = ' '
+                color = 2
             elif(intensity[y][x]<20):
                 shade = '.'
+                color = 1
             elif(intensity[y][x]<30):
                 shade = ','
+                color = 1
             elif(intensity[y][x]<40):
                 shade = ';'
+                color = 1
             elif(intensity[y][x]<50):
                 shade = '!'
+                color = 1
             elif(intensity[y][x]<60):
                 shade = '%'
+                color = 1
             elif(intensity[y][x]<70):
                 shade = '&'
+                color = 1
             elif(intensity[y][x]<80):
                 shade = '#'
+                color = 1
             elif(intensity[y][x]<90):
                 shade = '$'
+                color = 1
             else:
                 shade = '@'
+                color = 1
             try:
-                stdscr.addch(y, x, shade)
+                stdscr.addch(y, x, shade, curses.color_pair(color))
             except:
                 pass
 
