@@ -4,7 +4,7 @@ import math
 import random
 import sys
 
-def main():
+def main(stdscr):
     usage = "jmatrix.py [-t timeout] [-c \"character list\"] [-s] [-h]"
     stdscr = curses.initscr()
     curses.curs_set(0)
@@ -12,6 +12,7 @@ def main():
     curses.noecho()
     curses.cbreak()
     curses.start_color()
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
     stdscr.keypad(True)
     stdscr.nodelay(True)
     maxyx = stdscr.getmaxyx()
@@ -119,10 +120,10 @@ def drawString(stdscr, string):
             except:
                 pass
         try:
-            stdscr.addch(curs[0], curs[1], i, curses.COLOR_GREEN)
+            stdscr.addch(curs[0], curs[1], i, curses.color_pair(1))
         except:
             pass
         curs[0] -= 1
 
-if __name__ == '__main__':
-    main()
+stdscr = curses.initscr()
+curses.wrapper(main)
