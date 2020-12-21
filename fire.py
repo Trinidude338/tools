@@ -17,6 +17,7 @@ def main():
     stdscr.nodelay(True)
     maxyx = stdscr.getmaxyx()
     frame = 0
+    extinguish = 0
     playing = 1
     intensity = [[0 for x in range(maxyx[1])] for y in range(maxyx[0])]
     intensity = addBuff(stdscr, intensity)
@@ -39,9 +40,15 @@ def main():
                 playing = 0
             else:
                 playing = 1
+        if(c=='e'):
+            if(extinguish==1):
+                extinguish = 0
+            else:
+                extinguish = 1
         #do stuff
         if(playing):
-            intensity = addBuff(stdscr, intensity)
+            if(not extinguish):
+                intensity = addBuff(stdscr, intensity)
             intensity = dispurseBuff(stdscr, intensity)
         #
         stdscr.refresh()
