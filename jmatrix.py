@@ -13,11 +13,15 @@ def main(stdscr):
     curses.cbreak()
     curses.start_color()
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     stdscr.keypad(True)
     stdscr.nodelay(True)
     maxyx = stdscr.getmaxyx()
     strings = []
     frame = 0
+    randColor = 0
     playing = 1
     elapsed0 = time.time()
     timeout = 0
@@ -62,6 +66,11 @@ def main(stdscr):
                 playing = 0
             else:
                 playing = 1
+        elif(c=='r'):
+            if(randColor==1):
+                randColor = 0
+            else:
+                randColor = 1
         #do stuff
         if(len(strings)<maxyx[1]-1):
             if(playing):
@@ -79,6 +88,10 @@ def main(stdscr):
                         i[4] -= 1
                     else:
                         i[4] = 5
+                    if(randColor):
+                        i[5] = random.randrange(1, 5)
+                    else:
+                        i[5] = 1
         for i in strings:
             if(i[0]>=maxyx[0]+i[2]):
                 strings.remove(i)
@@ -90,7 +103,7 @@ def main(stdscr):
     curses.endwin()
 
 def genString(stdscr, strings, charsinp):
-    #[y, x, len, [chars], blink]
+    #[y, x, len, [chars], blink, color]
     maxyx = stdscr.getmaxyx()
     lst = [0]
     options0 = []
@@ -108,6 +121,7 @@ def genString(stdscr, strings, charsinp):
         chars.append(chr(random.choice(charsinp)))
     lst.append(chars)
     lst.append(random.randrange(6))
+    lst.append(1)
     return lst
 
 def drawString(stdscr, string):
@@ -120,7 +134,7 @@ def drawString(stdscr, string):
             except:
                 pass
         try:
-            stdscr.addch(curs[0], curs[1], i, curses.color_pair(1))
+            stdscr.addch(curs[0], curs[1], i, curses.color_pair(string[5]))
         except:
             pass
         curs[0] -= 1
