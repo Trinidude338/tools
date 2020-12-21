@@ -11,6 +11,7 @@ def main():
     curses.noecho()
     curses.cbreak()
     curses.start_color()
+    thaCollas = (curses.COLOR_BLUE, curses.COLOR_CYAN, curses.COLOR_RED, curses.COLOR_MAGENTA, curses.COLOR_YELLOW, curses.COLOR_WHITE)
     curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_RED)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_BLACK)
     stdscr.keypad(True)
@@ -18,6 +19,7 @@ def main():
     maxyx = stdscr.getmaxyx()
     frame = 0
     extinguish = 0
+    randColor = 0
     playing = 1
     intensity = [[0 for x in range(maxyx[1])] for y in range(maxyx[0])]
     intensity = addBuff(stdscr, intensity)
@@ -27,7 +29,7 @@ def main():
         else:
             frame += 1
         #draw stuff
-        drawBuff(stdscr, intensity)
+        drawBuff(stdscr, intensity, randColor)
         #
         try:
             c = stdscr.get_wch()
@@ -43,8 +45,12 @@ def main():
         if(c=='e'):
             if(extinguish==1):
                 extinguish = 0
+                randColor = 0
             else:
                 extinguish = 1
+        if(c=='r'):
+            curses.init_pair(3, random.choice(thaCollas), random.choice(thaCollas))
+            randColor = 2
         #do stuff
         if(playing):
             if(not extinguish):
@@ -127,7 +133,7 @@ def addBuff(stdscr, intensity):
             intensity[y][x] = random.randrange(75, 95)
     return intensity
 
-def drawBuff(stdscr, intensity):
+def drawBuff(stdscr, intensity, colorR):
     maxyx = stdscr.getmaxyx()
     for y in range(maxyx[0]):
         for x in range(maxyx[1]):
@@ -136,31 +142,31 @@ def drawBuff(stdscr, intensity):
                 color = 2
             elif(intensity[y][x]<20):
                 shade = '.'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<30):
                 shade = ','
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<40):
                 shade = ';'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<50):
                 shade = '!'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<60):
                 shade = '%'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<70):
                 shade = '&'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<80):
                 shade = '#'
-                color = 1
+                color = 1+colorR
             elif(intensity[y][x]<90):
                 shade = '$'
-                color = 1
+                color = 1+colorR
             else:
                 shade = '@'
-                color = 1
+                color = 1+colorR
             try:
                 stdscr.addch(y, x, shade, curses.color_pair(color))
             except:
