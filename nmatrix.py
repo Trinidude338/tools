@@ -100,6 +100,8 @@ def main(stdscr):
                 break
         if(c=='q'):
             break
+        elif(c=='d'):
+            lines = []
         elif(c==' '):
             if(playing==1):
                 playing = 0
