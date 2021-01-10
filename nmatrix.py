@@ -196,7 +196,7 @@ def genLine(stdscr, lines, charsinp, ovrideY=-1, ovrideX=-1, ovrideDir=-1):
     x = 0
     for i in lst[3]:
         x += len(i)
-    while(x<maxyx[1]*8.7/10):
+    while(x<maxyx[1]):
         lst[3].append(random.choice(charsinp))
         x = 0
         for i in lst[3]:
