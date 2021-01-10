@@ -74,7 +74,7 @@ def main(stdscr):
         if(i=="-t"):
             timeout = int(sys.argv[num+1])
         elif(i=="-w"):
-            words = [str(x) for x in sys.argv[num+1].split()]
+            words = [str(x) for x in sys.argv[num+1].split('\\'+'n')]
         elif(i=="-s"):
             screensaver = 1
         elif(i=="-h" or i=="--help"):
