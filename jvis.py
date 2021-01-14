@@ -1,6 +1,7 @@
 import sounddevice
 import curses
 import time
+import numpy as np
 
 def main():
     stdscr = curses.initscr()
@@ -19,12 +20,32 @@ def main():
     stdscr.nodelay(True)
     stdscr.keypad(True)
     maxyx = stdscr.getmaxyx()
-    rec = sounddevice.rec(frames=int(44100/80), channels=2)
-    sounddevice.wait()
+    frames = 75.0
+    if(sounddevice.default.samplerate is None):
+        sounddevice.default.samplerate = 22050
+    rec = np.array(sounddevice.rec(frames=int(sounddevice.default.samplerate/frames), channels=2, blocking=True))
+    newRec = np.array([[0.0, 0.0] for x in range(maxyx[1])])
+    for i in range(maxyx[1]):
+        sliced = np.array(rec[int((i/maxyx[1])*len(rec)):int((i+1/maxyx[1])*len(rec))])
+        left = 0
+        right = 0
+        for j in sliced:
+            left += j[0]
+            right += j[1]
+        left /= len(sliced)
+        right /= len(sliced)
+        if(rec[i][0]<left):
+            newRec[i][0] = left
+        else:
+            newRec[i][0] = rec[i][1]-0.2
+        if(rec[i][1]<right):
+            newRec[i][1] = right
+        else:
+            newRec[i][1] = rec[i][1]-0.2
     playing = 1
     while(1):
         #draw frame
-        drawScopeStereo(stdscr, rec)
+        drawScopeStereo(stdscr, newRec)
         #
         #input
         try:
@@ -40,25 +61,53 @@ def main():
             else:
                 playing = 1
         if(playing):
-            rec = sounddevice.rec(frames=int(44100/80), channels=2)
-            sounddevice.wait()
+            elap0 = time.time()
+            rec = np.array(sounddevice.rec(frames=int(sounddevice.default.samplerate/frames), channels=2, blocking=True))
+            elap1 = time.time()
+            elap = elap1 - elap0
+            for i in range(maxyx[1]):
+                sliced = np.array(rec[int((i/maxyx[1])*len(rec)):int((i+1/maxyx[1])*len(rec))])
+                left = 0
+                right = 0
+                for j in sliced:
+                    left += j[0]
+                    right += j[1]
+                left /= len(sliced)
+                right /= len(sliced)
+                if(newRec[i][0]<left):
+                    newRec[i][0] = left
+                else:
+                    newRec[i][0] -= 0.05
+                if(newRec[i][1]<right):
+                    newRec[i][1] = right
+                else:
+                    newRec[i][1] -= 0.05
         stdscr.refresh()
         stdscr.erase()
-        time.sleep(0.00125)
+        if((frames*0.000028)-elap>0):
+            time.sleep((frames*0.000028)-elap)
     curses.endwin()
 
 def drawScopeStereo(stdscr, rec):
     maxyx = stdscr.getmaxyx()
+    for i in range(maxyx[1]):
+        if(i%3==0):
+            continue
+        stdscr.addch(int(maxyx[0]/2), i, ' ', curses.color_pair(4))
     for num, i in enumerate(rec):
         if(i[0]>=0.0):
             for num2, j in enumerate(range(int(i[0]*maxyx[0])+1)):
-                if(int(maxyx[0]/2-num2)%8==1):
+                if(num%3==0):
+                    break
+                if(num2<=0.0):
+                    color = 4
+                elif(int(maxyx[0]/2-num2)%8==1):
                     color = 1
                 elif(int(maxyx[0]/2-num2)%8==2):
                     color = 2
                 elif(int(maxyx[0]/2-num2)%8==3):
                     color = 3
-                elif(int(maxyx[0]/2-num2)%8==4 or int(maxyx[0]/2-num2)==int(maxyx[0]/2)):
+                elif(int(maxyx[0]/2-num2)%8==4):
                     color = 4
                 elif(int(maxyx[0]/2-num2)%8==5):
                     color = 5
@@ -67,21 +116,24 @@ def drawScopeStereo(stdscr, rec):
                 elif(int(maxyx[0]/2-num2)%8==7):
                     color = 7
                 else:
-                    color = 0
-                if(num%3!=0):
-                    try:
-                        stdscr.addch(int(maxyx[0]/2-num2), num, ' ', curses.color_pair(color))
-                    except:
-                        pass
+                    color = 4
+                try:
+                    stdscr.addch(int(maxyx[0]/2-num2), num, ' ', curses.color_pair(color))
+                except:
+                    pass
         if(i[1]>=0.0):
             for num2, j in enumerate(range(int((i[1])*maxyx[0])+1)):
-                if(int(maxyx[0]/2+num2)%8==1):
+                if(num%3==0):
+                    break
+                if(num2<=0.0):
+                    color = 4
+                elif(int(maxyx[0]/2+num2)%8==1):
                     color = 1
                 elif(int(maxyx[0]/2+num2)%8==2):
                     color = 2
                 elif(int(maxyx[0]/2+num2)%8==3):
                     color = 3
-                elif(int(maxyx[0]/2+num2)%8==4 or int(maxyx[0]/2+num2)==int(maxyx[0]/2)):
+                elif(int(maxyx[0]/2+num2)%8==4):
                     color = 4
                 elif(int(maxyx[0]/2+num2)%8==5):
                     color = 5
@@ -90,12 +142,11 @@ def drawScopeStereo(stdscr, rec):
                 elif(int(maxyx[0]/2+num2)%8==7):
                     color = 7
                 else:
-                    color = 0
-                if(num%3!=0):
-                    try:
-                        stdscr.addch(int(maxyx[0]/2+num2), num, ' ', curses.color_pair(color))
-                    except:
-                        pass
+                    color = 4
+                try:
+                    stdscr.addch(int(maxyx[0]/2+num2), num, ' ', curses.color_pair(color))
+                except:
+                    pass
 
 
 if __name__ == '__main__':
