@@ -133,7 +133,11 @@ def drawMenu(stdscr, songs, curs):
         rCurs = int(maxyx[0]/2+(curs-(len(songs)-maxyx[0]/2)))
     else:
         visible = songs[int(curs-(maxyx[0]/2)):int(curs+(maxyx[0]/2))]
-        rCurs = int(maxyx[0]/2)+1
+        #rCurs = int(maxyx[0]/2)+1
+        if((maxyx[0]/2)%1==0):
+            rCurs = int(maxyx[0]/2)
+        else:
+            rCurs = int(maxyx[0]/2)+1
     for num, i in enumerate(visible):
         if(num==rCurs):
             try:
