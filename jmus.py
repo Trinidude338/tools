@@ -23,6 +23,7 @@ def main(stdscr):
     maxyx = stdscr.getmaxyx()
     formats = [".mp3", ".wav", ".wma", ".mp4", ".mp4"]
     frame = 0
+    repeat = 0
     playing = 1
     state = 0
     prev = 0
@@ -31,6 +32,7 @@ def main(stdscr):
     volume = 100
     stopped = False
     prevSongs = []
+    prevSearch = ""
     songs0 = os.listdir()
     songs = []
     for num, i in enumerate(songs0):
@@ -50,7 +52,7 @@ def main(stdscr):
             frame += 1
         #draw stuff
         if(state==0):
-            drawPlayer(stdscr, song, length, dur, volume)
+            drawPlayer(stdscr, song, length, dur, volume, repeat)
         else:
             drawMenu(stdscr, songs, curs, length, dur, volume)
         #
@@ -126,6 +128,12 @@ def main(stdscr):
                 state = 0
             else:
                 state = 1
+        elif(c=='r'):
+            if(repeat==0):
+                repeat = 1
+                repSong = song
+            else:
+                repeat = 0
         elif(c=='z'):
             stopped = False
             player.stop()
@@ -152,14 +160,18 @@ def main(stdscr):
         elif(c=='b'):
             stopped = False
             player.stop()
-            if(prev>0):
-                song = prevSongs[(prev+1)*-1]
-                prev -= 1
+            if(repeat==0):
+                if(prev>0):
+                    song = prevSongs[(prev+1)*-1]
+                    prev -= 1
+                else:
+                    song = random.choice(songs)
+                    if(prevSongs[-1]!=song):
+                        prevSongs.append(song)
+                player = vlc.MediaPlayer(song)
             else:
-                song = random.choice(songs)
-                if(prevSongs[-1]!=song):
-                    prevSongs.append(song)
-            player = vlc.MediaPlayer(song)
+                song = repSong
+                player = vlc.MediaPlayer(repSong)
         elif(c==curses.KEY_RIGHT):
             player.set_time(player.get_time()+5000)
         elif(c==curses.KEY_LEFT):
@@ -192,7 +204,10 @@ def main(stdscr):
             stopped = False
             player.stop()
             prev = 0
-            song = random.choice(songs)
+            if(repeat==0):
+                song = random.choice(songs)
+            else:
+                song = repSong
             player = vlc.MediaPlayer(song)
         dur = player.get_length()
         player.audio_set_volume(volume)
@@ -235,11 +250,14 @@ def drawMenu(stdscr, songs, curs, length, duration, volume):
     status = "[/]Start Search    [N]Next Search Item    Volume: "+str(volume)+'  '+"T: "+str(tminus)
     stdscr.addstr(0, int(maxyx[1]-len(status)), status, curses.color_pair(1))
 
-def drawPlayer(stdscr, song, length, duration, volume):
+def drawPlayer(stdscr, song, length, duration, volume, repeat):
     size = 50
     line0 = "[Z]Previous    [X]Play    [C]Toggle Pause    [V]Stop    [B]Next    [M]Song list"
+    line2 = "[R]Repeat Song"
     line1 = ""
     line1 += "Volume: "+str(volume)
+    if(repeat==1):
+        line1 += " (ON REPEAT)"
     maxyx = stdscr.getmaxyx()
     stdscr.addstr(int(maxyx[0]/2)-1, int(maxyx[1]/2-(len(song)/2)), song, curses.color_pair(3))
     complete = ""
@@ -268,7 +286,8 @@ def drawPlayer(stdscr, song, length, duration, volume):
     complete += tminus
     stdscr.addstr(int(maxyx[0]/2)+1, int(maxyx[1]/2-(len(complete)/2)), complete, curses.color_pair(2))
     stdscr.addstr(int(maxyx[0]/2)+3, int(maxyx[1]/2-(len(line0)/2)), line0, curses.color_pair(4))
-    stdscr.addstr(int(maxyx[0]/2)+5, int(maxyx[1]/2-(len(line1)/2)), line1, curses.color_pair(1))
+    stdscr.addstr(int(maxyx[0]/2)+5, int(maxyx[1]/2-(len(line2)/2)), line2, curses.color_pair(4))
+    stdscr.addstr(int(maxyx[0]/2)+7, int(maxyx[1]/2-(len(line1)/2)), line1, curses.color_pair(1))
 
 stdscr = curses.initscr()
 curses.wrapper(main)
