@@ -40,6 +40,7 @@ def main(stdscr):
             songs.append(i)
     if(len(songs)<1):
         exit(1)
+    songs.sort()
     song = random.choice(songs)
     prevSongs.append(song)
     player = vlc.MediaPlayer(song)
@@ -211,6 +212,7 @@ def main(stdscr):
             player = vlc.MediaPlayer(song)
         dur = player.get_length()
         player.audio_set_volume(volume)
+        prevSongs[:] = prevSongs[-20:]
         #
         stdscr.refresh()
         stdscr.erase()
