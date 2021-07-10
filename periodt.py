@@ -2,13 +2,13 @@ import curses
 import math
 import time
 
-gridNumber = [0, 17, 18, 19, 30, 31, 32, 33, 34, 35, 36, 37, 48, 49, 50, 51, 52, 53]
+gridNumber = [0, 3, 4, 5, 6, 7, 8, 17, 18, 19, 30, 31, 32, 33, 34, 35, 36, 37, 48, 49, 50, 51, 52, 53]
 gridNumber.extend(range(54, 126))
 gridNumber.extend(range(146, 161))
 gridNumber.extend(range(164, 179))
 
 symbols = [
-        "H",                                                                                                "He", 
+        "H",             'Metal', 'Metal', 'Trans', 'Metal', 'gen', 'Gas',                                                           "He", 
         "Li", "Be",                                                                "B", "C", "N", "O", "F", "Ne", 
         "Na", "Mg",                                                             "Al", "Si", "P", "S", "Cl", "Ar",
         "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
@@ -20,7 +20,7 @@ symbols.extend(["La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho"
 symbols.extend(["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"])
 
 atomicNumber = [
-        1,                                                                   2,
+        1,          '', '', 'Metal', '', '', '',                                  2,
         3, 4,                                                5, 6, 7, 8, 9, 10,
         11, 12,                                         13, 14, 15, 16, 17, 18,
         19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
@@ -32,7 +32,7 @@ atomicNumber.extend(range(57, 72))
 atomicNumber.extend(range(89, 104))
 
 massNumber = [
-        1.008,                                                                                                                 4.003,
+        1.008,               'Basic', 'Trans', 'Post', 'Non', 'Halo', 'Noble',                                                                           4.003,
         6.94, 9.012,                                                                        10.81, 12.01, 14.01, 16.00, 19.00, 20.18,
         22.99, 24.31,                                                                       26.98, 28.09, 30.97, 32.06, 35.45, 39.95,
         39.10, 40.08, 44.96, 47.87, 50.94, 52.00, 54.94, 55.85, 58.93, 58.69, 63.55, 65.38, 69.72, 72.63, 74.92, 78.97, 79.90, 83.80,
@@ -43,7 +43,26 @@ massNumber = [
 massNumber.extend([138.91, 140.12, 140.91, 144.24, 145.0, 150.36, 151.96, 157.25, 158.93, 162.50, 164.93, 167.26, 168.93, 173.04, 174.97])
 massNumber.extend([227.0, 232.04, 231.04, 238.03, 237.0, 244.0, 243.0, 247.0, 247.0, 251.0, 252.0, 257.0, 258.0, 259.0, 262.0])
 
-def drawTable(stdscr, symbols, atomicNumber, massNumber, gridNumber):
+
+# 0 - unknown, 
+# 1 - alkali metals,  
+# 2 - transition metals,
+# 3 - metals,
+# 4 - non-metals,
+# 5 - halogens,
+# 6 - nobel gases.
+colorArr = [
+        4,       1, 2, 3, 4, 5, 6,                         6,
+        1, 1,                               3, 4, 4, 4, 5, 6, 
+        1, 1,                               3, 3, 4, 4, 5, 6, 
+        1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 5, 6,
+        1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 6, 
+        1, 1, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 6, 
+        1, 1, 7, 2, 2, 2, 2, 2, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7,
+        ]
+for i in range(30): colorArr.extend([7])
+
+def drawTable(stdscr):
     maxyx = stdscr.getmaxyx()
     #line0 = "+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+"
     line0 = [ curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_HLINE, curses.ACS_PLUS]
@@ -66,29 +85,25 @@ def drawTable(stdscr, symbols, atomicNumber, massNumber, gridNumber):
     for i in line0:
         stdscr.addch(curs[0], curs[1], i)
         curs[1] += 1
-    curs[0] = topLeftCorner[0]
-    curs[1] = topLeftCorner[1]+7
-    for x in range(95):
-        stdscr.addch(curs[0], curs[1], ' ')
-        curs[1] += 1
-    curs[0] = topLeftCorner[0]+1
-    curs[1] = topLeftCorner[1]+7
-    for x in range(95):
-        stdscr.addch(curs[0], curs[1], ' ')
-        curs[1] += 1
-    curs[0] = topLeftCorner[0]+2
-    curs[1] = topLeftCorner[1]+7
-    for x in range(95):
-        stdscr.addch(curs[0], curs[1], ' ')
-        curs[1] += 1
-    curs[0] = topLeftCorner[0]+3
-    curs[1] = topLeftCorner[1]+7
-    for x in range(95):
+    for i in range(4):
+        curs[0] = topLeftCorner[0]+i
+        curs[1] = topLeftCorner[1]+7
+        for x in range(11):
+            stdscr.addch(curs[0], curs[1], ' ')
+            curs[1] += 1
+        curs[0] = topLeftCorner[0]+i
+        curs[1] = topLeftCorner[1]+7+48
+        for x in range(47):
+            stdscr.addch(curs[0], curs[1], ' ')
+            curs[1] += 1
+    curs[0] = topLeftCorner[0]+4
+    curs[1] = topLeftCorner[1]+13
+    for x in range(5):
         stdscr.addch(curs[0], curs[1], ' ')
         curs[1] += 1
     curs[0] = topLeftCorner[0]+4
-    curs[1] = topLeftCorner[1]+13
-    for x in range(59):
+    curs[1] = topLeftCorner[1]+55
+    for x in range(17):
         stdscr.addch(curs[0], curs[1], ' ')
         curs[1] += 1
     curs[0] = topLeftCorner[0]+5
@@ -147,13 +162,16 @@ def drawTable(stdscr, symbols, atomicNumber, massNumber, gridNumber):
     for num, x in enumerate(gridNumber):
         curs[0] = int(topLeftCorner[0]+int(x/18)*4)+1
         curs[1] = int(topLeftCorner[1]+int(x%18)*6)+1
-        stdscr.addstr(curs[0], curs[1], str(massNumber[num])[:5])
+        stdscr.addstr(curs[0], curs[1], "     ", curses.color_pair(colorArr[num]))
+        stdscr.addstr(curs[0], curs[1], str(massNumber[num])[:5], curses.color_pair(colorArr[num]))
         curs[0] = int(topLeftCorner[0]+int(x/18)*4)+2
         curs[1] = int(topLeftCorner[1]+int(x%18)*6)+1
-        stdscr.addstr(curs[0], curs[1], symbols[num])
+        stdscr.addstr(curs[0], curs[1], "     ", curses.color_pair(colorArr[num]))
+        stdscr.addstr(curs[0], curs[1], symbols[num], curses.color_pair(colorArr[num]))
         curs[0] = int(topLeftCorner[0]+int(x/18)*4)+3
         curs[1] = int(topLeftCorner[1]+int(x%18)*6)+1
-        stdscr.addstr(curs[0], curs[1], str(atomicNumber[num]))
+        stdscr.addstr(curs[0], curs[1], "     ", curses.color_pair(colorArr[num]))
+        stdscr.addstr(curs[0], curs[1], str(atomicNumber[num]), curses.color_pair(colorArr[num]))
 
 def screenTooSmall(stdscr):
     maxyx = stdscr.getmaxyx()
@@ -167,6 +185,13 @@ def screenTooSmall(stdscr):
 def main():
     stdscr = curses.initscr()
     curses.start_color()
+    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_GREEN)
+    curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_CYAN)
+    curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
+    curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_RED)
+    curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.raw()
     curses.noecho()
     curses.cbreak()
@@ -178,7 +203,7 @@ def main():
         screenTooSmall(stdscr)
         curses.endwin()
         exit(1)
-    drawTable(stdscr, symbols, atomicNumber, massNumber, gridNumber)
+    drawTable(stdscr)
     stdscr.refresh()
     while(stdscr.getch()==curses.ERR):
         time.sleep(0.01)
